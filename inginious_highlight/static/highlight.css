@@ -1,0 +1,31 @@
+.CodeMirror-linebackground.ph-red {
+    background-color: #f9f2f4;
+}
+
+.CodeMirror-linebackground.ph-darkred {
+    background-color: lightcoral;
+}
+
+.CodeMirror-linebackground.ph-green {
+    background-color: #dff0d8;
+}
+
+.CodeMirror-linebackground.ph-darkgreen {
+    background-color: #43ac6a;
+}
+
+.CodeMirror-linebackground.ph-blue {
+    background-color: #d9edf7;
+}
+
+.CodeMirror-linebackground.ph-darkblue {
+    background-color: #5bc0de;
+}
+
+.CodeMirror-linebackground.ph-yellow, .CodeMirror-linebackground.ph-default {
+    background-color: #fcf8e3;
+}
+
+.CodeMirror-linebackground.ph-orange {
+    background-color: #e99002;
+}
