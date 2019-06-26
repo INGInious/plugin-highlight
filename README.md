@@ -30,7 +30,7 @@ feedback.set_custom_value("highlight", {"subproblem_id": [2, 4]})
 # Colors the lines 1,2,3 of subproblem "subproblem_id1" with a pale red,
 # and lines 5 of subproblem "subproblem_id2" with a darker green
 feedback.set_custom_value("highlight", {
-    "subproblem_id1": {"lines": [1, 2, 3], "color": "red"},
+    "subproblem_id1": [{"lines": [1, 2, 3], "color": "red"}, {"lines": [4], "color": "darkred"}],
     "subproblem_id2": {"lines": [5], "color": "darkgreen"},
 })
 ```
@@ -44,7 +44,7 @@ feedback-custom --json highlight '{"subproblem_id": 3}'
 feedback-custom --json highlight '{"subproblem_id": [2, 4]}'
 # Colors the lines 1,2,3 of subproblem "subproblem_id1" with a pale red,
 # and lines 5 of subproblem "subproblem_id2" with a darker green
-feedback-custom --json highlight '{"subproblem_id1": {"lines": [1, 2, 3], "color": "red"}}, {"subproblem_id2": {"lines": [5], "color": "darkgreen"}}'
+feedback-custom --json highlight '{"subproblem_id1": [{"lines": [1, 2, 3], "color": "red"}, {"lines": [4], "color": "darkred"}], "subproblem_id2": {"lines": [5], "color": "darkgreen"}}'
 ```
 
 

@@ -28,10 +28,29 @@ class StaticMockPage(object):
     def POST(self, path):
         return self.GET(path)
 
+def parse_highlight_entry(sidx, entry):
+    if isinstance(entry, list):
+        lines = entry
+        color = "default"
+    elif isinstance(entry, int):
+        lines = [entry]
+        color = "default"
+    elif isinstance(entry, dict):
+        lines = entry["lines"]
+        color = entry["color"]
+    else:
+        raise Exception("Invalid")
+
+    if color not in AUTHORIZED_COLORS:
+        color = "default"
+
+    return [(sidx, l, color) for l in lines]
+
 def add_feedback_script(task, submission):
     if "custom" not in submission or "highlight" not in submission["custom"]:
         return
     todo = []
+    error = False
 
     subproblems = set(x.get_id() for x in task.get_problems() if isinstance(x, DisplayableCodeProblem))
 
@@ -40,31 +59,17 @@ def add_feedback_script(task, submission):
             try:
                 if isinstance(d, int):
                     todo.append((sidx, d, "default"))
-                else:
+                elif isinstance(d, list):
                     for entry in d:
-                        if isinstance(entry, list):
-                            lines = entry
-                            color = "default"
-                        elif isinstance(entry, int):
-                            lines = [entry]
-                            color = "default"
-                        elif isinstance(entry, dict):
-                            lines = entry["lines"]
-                            color = entry["color"]
-                        else:
-                            continue
-
-                        if color not in AUTHORIZED_COLORS:
-                            color = "default"
-
-                        for l in lines:
-                            todo.append((sidx, l, color))
+                        todo += parse_highlight_entry(sidx, entry)
+                else:
+                    todo += parse_highlight_entry(sidx, d)
             except:
                 # badly formatted input, ignore
-                pass
+                error = True
 
     out =  "\n".join(["codeEditors['{}'].addLineClass({}, 'background', 'ph-{}');".format(sidx, line, color) for sidx, line, color in todo])
-    return "clear_highlight();\n" + out
+    return "clear_highlight();\n" + out + (";\n console.log(\"Invalid format for the highlight plugin.\");" if error else "")
 
 def init(plugin_manager, _, _2, _3):
     """ Init the plugin """
