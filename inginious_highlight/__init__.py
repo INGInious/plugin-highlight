@@ -5,28 +5,23 @@
 
 """ Allow to highlight code lines """
 import os
-import web
 
+from flask import send_from_directory
+from inginious.frontend.pages.utils import INGIniousPage
 from inginious.frontend.task_problems import DisplayableCodeProblem
 
 __version__ = "0.1.dev0"
 PATH_TO_PLUGIN = os.path.abspath(os.path.dirname(__file__))
 AUTHORIZED_COLORS = ["default", "blue", "darkblue", "red", "darkred", "green", "darkgreen", "yellow", "orange"]
 
-class StaticMockPage(object):
-    # TODO: Replace by shared static middleware and let webserver serve the files
-    def GET(self, path):
-        if not os.path.abspath(PATH_TO_PLUGIN) in os.path.abspath(os.path.join(PATH_TO_PLUGIN, path)):
-            raise web.notfound()
 
-        try:
-            with open(os.path.join(PATH_TO_PLUGIN, "static", path), 'rb') as file:
-                return file.read()
-        except:
-            raise web.notfound()
+class StaticMockPage(INGIniousPage):
+    def GET(self, path):
+        return send_from_directory(os.path.join(PATH_TO_PLUGIN, "static"), path)
 
     def POST(self, path):
         return self.GET(path)
+
 
 def parse_highlight_entry(sidx, entry):
     if isinstance(entry, list):
@@ -45,6 +40,7 @@ def parse_highlight_entry(sidx, entry):
         color = "default"
 
     return [(sidx, l, color) for l in lines]
+
 
 def add_feedback_script(task, submission):
     if "custom" not in submission or "highlight" not in submission["custom"]:
@@ -71,9 +67,10 @@ def add_feedback_script(task, submission):
     out =  "\n".join(["codeEditors['{}'].addLineClass({}, 'background', 'ph-{}');".format(sidx, line, color) for sidx, line, color in todo])
     return "clear_highlight();\n" + out + (";\n console.log(\"Invalid format for the highlight plugin.\");" if error else "")
 
+
 def init(plugin_manager, _, _2, _3):
     """ Init the plugin """
-    plugin_manager.add_page('/plugins/highlight/static/(.+)', StaticMockPage)
+    plugin_manager.add_page('/plugins/highlight/static/<path:path>', StaticMockPage.as_view("highlightstaticpage"))
     plugin_manager.add_hook("feedback_script", add_feedback_script)
     plugin_manager.add_hook("css", lambda: "/plugins/highlight/static/highlight.css")
     plugin_manager.add_hook("javascript_header", lambda: "/plugins/highlight/static/highlight.js")
